@@ -1,0 +1,10 @@
+{
+  "name": "Bengaluru Traffic Enforcement Dashboard",
+  "description": "Comprehensive Traffic Enforcement Analytics and Hotspot Analysis Suite for Bengaluru, covering 298,450 violations from Nov 2023 to Apr 2024.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
