@@ -247,10 +247,7 @@ export default function App() {
       </div>
 
       <footer className="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs font-semibold text-slate-500 shrink-0">
-        st.markdown(
-    "<p>© 2026 Bengaluru Police Department Operational Informatics | Analytics Division</p>",
-    unsafe_allow_html=True
-)
+       st.markdown("(c) 2026 Bengaluru Police Department Operational Informatics | Analytics Division")
       </footer>
     </div>
   );
