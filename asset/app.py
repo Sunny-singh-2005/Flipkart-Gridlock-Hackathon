@@ -55,7 +55,7 @@ export default function App() {
             </span>
             <span className="bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700/50 flex items-center gap-1.5 text-slate-300">
               <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              Period: Nov 2023 – Apr 2024
+              Period: Nov 2023 - Apr 2024
             </span>
           </div>
         </div>
