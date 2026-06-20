@@ -63,7 +63,7 @@ export default function AiAdvisor() {
           ...prev, 
           { 
             role: "model", 
-            text: `⚠️ **API Error:** ${data.error || "Failed to reach AI advisor. Ensure your GEMINI_API_KEY is configured in Secrets."}` 
+            text: `⚠️ **API Error:** ${data.error || "Failed to reach AI advisor. Ensure your API_KEY is configured in Secrets."}` 
           }
         ]);
       }
