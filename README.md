@@ -185,27 +185,113 @@ parksense/
 
 ---
 
-## ⚙️ Setup & Installation
+# 🚀 Project Setup Guide (React + Streamlit)
+
+This project consists of two parts:
+
+* Frontend (React)
+* Analytics Dashboard (Python + Streamlit)
+
+---
+
+## 🧩 1. Prerequisites
+
+Make sure you have installed:
+
+* Node.js (v16+)
+* Python (v3.8+)
+* pip (Python package manager)
+
+---
+
+## 📦 2. Clone the Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/parksense.git
-cd parksense
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate        # Linux/Mac
-venv\Scripts\activate           # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run Streamlit dashboard
-streamlit run app/streamlit_dashboard.py
-
-# Or open notebooks directly
-jupyter notebook notebooks/
+git clone <your-repo-link>
+cd project-folder
 ```
+
+---
+
+## ⚛️ 3. Setup React Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+👉 React app will run on:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🐍 4. Setup Python Backend (Streamlit)
+
+Open a **new terminal**:
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+If no requirements file, install manually:
+
+```bash
+pip install pandas numpy matplotlib plotly streamlit folium streamlit-folium
+```
+
+Run the app:
+
+```bash
+streamlit run app.py
+```
+
+👉 Streamlit dashboard will run on:
+
+```
+http://localhost:8501
+```
+
+---
+
+## 🔗 5. Connect Both
+
+In React, click:
+👉 **"View Analytics"**
+
+This opens:
+
+```
+http://localhost:8501
+```
+
+---
+
+## ⚠️ Important Notes
+
+* Both servers must run simultaneously
+* Keep both terminals open
+* If port changes, update link in React
+
+---
+
+## 🎥 Demo
+
+1. Start React app
+2. Start Streamlit app
+3. Open website
+4. Click "View Analytics"
+
+---
+
+## 🏁 Done!
+
+You now have a working **Smart Parking Analytics System** 🚗
+
 
 ### requirements.txt
 
