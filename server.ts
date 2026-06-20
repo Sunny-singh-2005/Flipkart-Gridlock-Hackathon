@@ -18,21 +18,20 @@ app.get("/api/health", (req, res) => {
 
 // Grounded Traffic Assistant API
 app.post("/api/chat", async (req, res) => {
-  try {
-    const { message, chatHistory } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Message is required." });
-    }
+  const { message, chatHistory } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: "Message is required." });
+  }
 
+  try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
       return res.status(200).json({
-        text: "**AI Assistant Notice**:\n\nThe `GEMINI_API_KEY` is not fully configured in your environment. To enable this real-time AI Traffic Advisor, please go to **Settings > Secrets** in the AI Studio sidebar and add your `GEMINI_API_KEY` variable. \n\n*However, the entire interactive Bengaluru Traffic Enforcement Dashboard, including tables, bubble charts, temporal analysis, vehicle profiling, priority recommendation matrix, and the custom geospatial map is fully operational below!*",
+        text: "**AI Assistant Notice**:\n\nThe API key is not fully configured in your environment. To enable this real-time AI Traffic Advisor, please go to **Settings > Secrets** in the AI Studio sidebar and add your appropriate secret variable. \n\n*However, the entire interactive Bengaluru Traffic Enforcement Dashboard, including tables, bubble charts, temporal analysis, vehicle profiling, priority recommendation matrix, and the custom geospatial map is fully operational below!*",
         isDemo: true
       });
     }
 
-    // Lazy instantiate Gemini SDK securely
     const ai = new GoogleGenAI({
       apiKey: apiKey,
       httpOptions: {
@@ -122,10 +121,143 @@ ROLE DIRECTIONS:
 
     res.json({ text: response.text });
   } catch (error: any) {
-    console.error("Gemini Chat API Error:", error);
-    res.status(500).json({ error: "Failed to generate AI response. Please verify your GEMINI_API_KEY in Secrets." });
+    console.error("AI Chat API Error:", error);
+    
+    // Check error context to see if it is a permission denied (403) or active project suspension
+    const errorStr = JSON.stringify(error) || error.toString() || "";
+    let alertHeader = "";
+    
+    if (errorStr.includes("PERMISSION_DENIED") || errorStr.includes("denied access") || error.status === 403 || error.code === 403) {
+      alertHeader = `⚠️ **API Error (403 Access Denial):** Your active Google Cloud project has encountered an access credential block. This typically means the Generative Language API is not enabled for your project, or the project has billing/regional restrictions. Please go to **Settings > Secrets** inside the AI Studio sidebar to check or replace your API key variables.`;
+    } else {
+      alertHeader = `⚠️ **API Sync Warning:** Failed to generate a real-time response. Please verify configured API variables under **Settings > Secrets** inside the AI Studio sidebar.`;
+    }
+
+    // Call the intelligent offline expert matcher to deliver a perfectly grounded, detailed factual fallback response
+    const fallbackText = getGroundedFallbackResponse(message);
+    
+    res.json({ 
+      text: `${alertHeader}\n\n---\n\n**Grounded AI Advisor Offline Response:**\n\n${fallbackText}`,
+      isDemo: true
+    });
   }
 });
+
+// Intelligent grounded offline query handler for seamless operation during API failures
+function getGroundedFallbackResponse(userQuery: string): string {
+  const query = userQuery.toLowerCase();
+
+  if (query.includes("gap") || query.includes("kodigehalli") || query.includes("station") || query.includes("market") || query.includes("pura") || query.includes("peenya")) {
+    return `### 📊 Bengaluru Traffic Enforcement Gaps Analysis
+
+Based on our validated 6-month analysis, standard municipal enforcement is limited by significant administrative throughput bottlenecks:
+
+*   **Kodigehalli Station (Priority 1 Zone):**
+    *   **Total Violations:** 10,916 records
+    *   **Approval Rate:** 21.6% (Lowest in the city)
+    *   **Backlog Status:** Over 7,500 pending cases expiring without penalty collection.
+    *   **Peak Window:** Evening hours (7 PM - 11 PM). Immediate operational target.
+*   **City Market Station (Priority 2 Zone):**
+    *   **Total Violations:** 17,646 records
+    *   **Approval Rate:** 34.9%
+    *   **Backlog Status:** Over 9,600 unresolved logs due to crowd density plate blurring.
+*   **K.R. Pura Station (Priority 3 Zone):**
+    *   **Total Violations:** 6,546 records
+    *   **Approval Rate:** 33.2%
+    *   **Backlog Status:** High volume of commercial transit violations.
+
+**Strategic Action Plan:** Reallocating physical surveillance grids from high-performing stations (e.g., Upparpet, which maintains high data cleanliness) to Kodigehalli and City Market during their busy evening intervals.`;
+  }
+
+  if (query.includes("anomaly") || query.includes("morning") || query.includes("5 am") || query.includes("5:00") || query.includes("upload") || query.includes("time") || query.includes("hour") || query.includes("peak")) {
+    return `### ⏰ Early Morning Peak Anomaly (5:00 AM) Explainer
+
+Our temporal visualization highlights an extremely pronounced spike at **5:00 AM**, with over **34,200 violations** recorded across the city. 
+
+**Root Cause Diagnostic:**
+This is a **systemic data-entry artifact**, not a reflection of real-world traffic flows:
+1.  **Batch Synchronization:** Bengaluru field officers use local handheld devices to record offences offline throughout their shifts.
+2.  **Shift Start Syncs:** At the start of morning shifts (around 5:00 AM), officers batch-upload their collected offline logs to the central database server.
+3.  **Real Congestion Peaks:** Real road traffic peaks are actually centered during afternoon commercial hours (**12:00 PM - 3:00 PM**) and evening commute windows (**6:00 PM - 9:00 PM**).
+
+**Command Recommendation Desk:**
+Database schemas should be updated to track two distinct values:
+*   \`device_timestamp\` (actual physical offence occurrence time)
+*   \`uploaded_timestamp\` (server sync time)
+This represents a crucial cleanup task before deploying physical patrol routes.`;
+  }
+
+  if (query.includes("camera") || query.includes("anpr") || query.includes("scooter") || query.includes("plate") || query.includes("capture") || query.includes("specification")) {
+    return `### 📷 New ANPR Camera Technical Specifications
+
+To capture the physical violation profile in Bengaluru, we have developed target hardware guidelines:
+
+*   **Two-Wheeler Target (46% of total violating fleet):**
+    *   Traditional front-plate capturing cameras fail because scooters/motorcycles typically do not feature front-facing vertical plate brackets.
+    *   **Dual-Sensor Array Required:** Deploying secondary rear-facing triggering loops with retro-reflective LED illumination is crucial.
+*   **Operational Calibration:**
+    *   **Shutter Velocity:** Minimum 1/1000s to eliminate high-frequency motion blur from lane-filtering vehicles.
+    *   **Resolution Density:** 1080p high contrast with optimized OCR parsing engines.
+    *   **Zone Integration:** Placed on existing overhead streetlights above major commercial corridors.`;
+  }
+
+  if (query.includes("hotspot") || query.includes("junction") || query.includes("safina") || query.includes("kr market") || query.includes("elite") || query.includes("sagar")) {
+    return `### 📍 Top Chronic Junction Clusters (Top 5)
+
+Our spatial mapping has ranked the highest-density violation epicenters in Bengaluru:
+
+1.  **Safina Plaza Junction (BTP051):**
+    *   **Total Violations:** 15,449 records (No. 1 citywide)
+    *   **Approval Rate:** 42.0%
+    *   **Dominant Infraction:** Wrong Parking (heavy double-parking outside retail zones)
+    *   **Primary Vehicle Type:** Passenger Auto (Rickshaws have a peak here of over 4,950 records)
+2.  **KR Market Junction (BTP044):**
+    *   **Total Violations:** 11,538 records
+    *   **Approval Rate:** 34.5%
+    *   **Dominant Infraction:** Footpath Enforcement & Sidewalk Parking
+3.  **Elite Junction:**
+    *   **Total Violations:** 10,718 records
+    *   **Approval Rate:** 32.1%
+4.  **Sagar Theatre Junction:**
+    *   **Total Violations:** 10,549 records
+    *   **Approval Rate:** 33.8%
+5.  **Central Street:**
+    *   **Total Violations:** 5,388 records
+    *   **Approval Rate:** 56.4%
+
+**Spatial Recommendation:** Focus automated ticket sweeps directly onto these top five nodes to clear up to 16% of total systemic congestion.`;
+  }
+
+  if (query.includes("vehicle") || query.includes("scooter") || query.includes("motorcycle") || query.includes("auto") || query.includes("rickshaw") || query.includes("car") || query.includes("distribution")) {
+    return `### 🚗 Bengaluru Infraction Vehicle Risk Profiles
+
+Within our 298,450 analyzed records, the distribution of violating vehicles highlights several risk vectors:
+
+*   **Scooter (32% count) + Motorcycle (14% count):** Combined two-wheelers account for **46%** of all offences. This is heavily centered on illegal side-street parking and sidewalk encroachments near commercial centers.
+*   **Passenger Cars (30% count):** Dominates high-density arterial parkways, particularly double-lane wrong parking.
+*   **Passenger Autos / Rickshaws (13% count):** Clustered near key transit exchange plazas (like Safina Plaza and KR Market).
+*   **Light Goods/Cargo Vehicles (11% count):** Night logistics and morning freight blockages.
+
+**Tactical Strategy:** Direct physical towing trucks towards motorcars and auto-rickshaws while allocating narrow camera trigger loops on sidewalks to handle scooters.`;
+  }
+
+  return `### 📘 Bengaluru Traffic Strategic Expert Briefing
+
+Welcome! I am your AI Traffic Enforcement Advisor here to provide a grounded summary of our research findings:
+
+*   **Database Analytics Scope:** 298,450 official traffic records spanning a contiguous 6-month observation period in Bengaluru.
+*   **Core Systems:**
+    1.  **Executive Summary Briefing:** High-level operational summaries.
+    2.  **Chronic Hotspots & Severity Rankings:** Ranked table of Top 20 severe junctions.
+    3.  **Enforcement Gap Analysis:** Identified pipeline leakage centers.
+    4.  **Temporal Patterns & Peak Indicators:** Discrepancy details between upload time vs event windows.
+    5.  **Vehicle Type Risk Profiling:** Comprehensive ANPR specs and fleet distribution analytics.
+    6.  **Interactive Geospatial Map:** Coordinate coordinate coordinates projecting exact cluster densities.
+    7.  **Executive PPT Deck:** Ready-made downloadable 16:9 slideshow for field leadership.
+
+**Quick Recommendation Summary:**
+To reclaim immediate administrative leakage, reallocate screening personnel directly to **Kodigehalli Station** and automate the validation capture at **Safina Plaza** and **KR Market** during evening commute peak hours.`;
+}
 
 // Configure Vite middleware in dev, or serve build outputs in production
 async function setupServer() {
