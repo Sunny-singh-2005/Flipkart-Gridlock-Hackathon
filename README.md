@@ -207,7 +207,7 @@ Make sure you have installed:
 ## 📦 2. Clone the Repository
 
 ```bash
-git clone <your-repo-link>
+git clone <https://github.com/Sunny-singh-2005/Flipkart-Gridlock-Hackatho>
 cd project-folder
 ```
 
